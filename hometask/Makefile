@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -g 
+CXXFLAGS = -Wall -Wextra -g -Werror
 
 SRC_DIR = src
 TEST_DIR = tests
