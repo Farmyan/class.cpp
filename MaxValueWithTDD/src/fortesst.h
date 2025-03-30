@@ -1,0 +1,1 @@
+int MatrixMaxValue(int array[], int size);
