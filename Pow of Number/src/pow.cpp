@@ -1,4 +1,4 @@
-double power(double x , double n)
+double power(double x , int n)
 {
     if(n>0)
     {
