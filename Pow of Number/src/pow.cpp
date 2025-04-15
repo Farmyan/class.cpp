@@ -2,28 +2,36 @@ double power(double x , int n)
 {
     if(n>0)
     {
-        double result0 = 1;
-        for(int i = 0 ; i < n ; i++)
+        if( x == 0)
         {
-            result0 *= x; 
-        }
-        return result0;
-    }
-    else 
-    {
-         if( x == 0)
-        {
+           if(n == 0)
+           {
+            return 1;
+           }
+           else
+            {
             return 0;
+            }
         }
         else
+        {    
+        double result1 = 1;
+        for(int i = 0 ; i < n ; i++)
         {
-        double result1 = 1 ;
-        double reversed = 1/x;
-        for(int i = 0 ; i > n ; i--)
-        {
-            result1 *= reversed; 
+            result1 *= x; 
         }
         return result1;
         }
+    }
+    else 
+    {
+        double result2 = 1 ;
+        double reversed = 1/x;
+        for(int i = 0 ; i > n ; i--)
+        {
+            result2 *= reversed; 
+        }
+        return result2;
+         
     }
 }
