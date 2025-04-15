@@ -122,6 +122,57 @@ TEST(PowerOfNumber , xEqualNEagtive7nEqualNegatie3OutputShouldBesmth)
     int n = {-3};
     EXPECT_EQ(power(x , n) , result );
 }
+TEST(PowerOfNumber , xEqual0nEqualNegatie3OutputShouldBesmth)
+{
+    int x = {0};
+    int result = { 1/x };
+    int n = {-3};
+    EXPECT_EQ(power(x , n) , result );
+}
+TEST(PowerOfNumber , xEqua00nEqualN0OutputShouldBe1)
+{
+    double result = { 1};
+    int x = {0};
+    int n = {0};
+    EXPECT_EQ(power(x , n) , result );
+}
+TEST(PowerOfNumber , xEqua05nEqual2OutputShouldBe025)
+{
+    double result = { 0.25 };
+    double x = {0.5};
+    int n = {2};
+    EXPECT_EQ(power(x , n) , result );
+}
+TEST(PowerOfNumber , xEquasqrt2nEqual2OutputShouldBe025)
+{
+    double result = { 2 };
+    double x = {sqrt(2)};
+    int n = {2};
+    EXPECT_EQ(power(x , n) , result );
+}
+TEST(PowerOfNumber , xEqua2nEqualLargeNumOutputShouldBeLarge)
+{
+    double result = { 4294967296 };
+    double x = {2};
+    int n = {32};
+    EXPECT_EQ(power(x , n) , result );
+}
+TEST(PowerOfNumber , xEqua1000nEqual3OutputShouldBe025)
+{
+    double result = { 1000000000 };
+    double x = {1000};
+    int n = {3};
+    EXPECT_EQ(power(x , n) , result );
+}
+
+
+
+
+
+
+
+
+
 
 
 
