@@ -1,23 +1,17 @@
-double power(double x , int n)
+double power(double x, int n) 
 {
-    if( x == 0 && n == 0)
-        {
-            return 1;   
-        }
+    if (x == 0 && n == 0) {
+        return 1; 
+    }
+    double number = x;
+    int times = n;
+    if (n < 0) {
+        number = 1 / x;
+        times = -n;
+    }
     double result = 1;
-        if(n>0)
-        {
-            for(int i = 0 ; i < n ; i++)
-              {
-                 result *= x;
-              }
-        } 
-    double reversed = 1/x;
-        for(int i = 0 ; i > n ; i--)
-            {
-                result *= reversed; 
-            }
-
-     return result;
+    for (int i = 0; i < times; i++) {
+        result *= number;
+    }
+    return result;
 }
-
