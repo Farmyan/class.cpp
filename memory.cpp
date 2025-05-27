@@ -1,25 +1,26 @@
 #include <stdio.h>
 
-
-void f()
+void f() 
 {
-    
-    int local = 15;
-    
- 
+  int local = 14;
 }
-int main()
+
+int main() 
 {
-  f();
-  char* main_ptr = (char*)&main;
-  printf("main_ptr=%p\n" , &main_ptr);
-  char* ptr = (char*)&f;
-  printf("f=%p\n" , &ptr);
-  for (int i = 0; i < 64; i++)
-  {
-    printf("%p\n ", (0xFF & *(ptr-i)));
-  }
-  
+    f();  
+
+ 
+    char* f_ptr = (char*)&f;
+
+    printf(" %p\n", &f_ptr);
+    printf(" %p\n", f);
+
+    for (int i = 0; i < 45; i++) 
+    {
+        printf("%p ", (0xFF & *(f_ptr - i)));
+        if (i % 8 == 7) printf("\n");  
+    }
+
     return 0;
 }
 
