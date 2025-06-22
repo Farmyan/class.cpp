@@ -2,9 +2,7 @@
 
 void f(int x)
 {
-    int a = x;
-    int b = 10;
-    int c = a + b;
+
 
     char* f_ptr = (char*)&f;   
     char smth = 42;            
