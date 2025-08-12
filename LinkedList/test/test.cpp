@@ -233,3 +233,110 @@ TEST(LinkedList, Remove_InvalidPosition) {
         EXPECT_EQ(e.what(), "Out of line");
     } 
 }
+
+//ForEach
+TEST(LinkedList, ForEach_ModifyElements)
+{
+    LinkedList<int> list;
+    list.InsertTail(1);
+    list.InsertTail(2);
+    list.InsertTail(3);
+
+    list.ForEach([](int &x) { x += 10; });
+
+    EXPECT_EQ(list.Get(0), 11);
+    EXPECT_EQ(list.Get(1), 12);
+    EXPECT_EQ(list.Get(2), 13);
+}
+
+TEST(LinkedList, ForEach_SumValues)
+{
+    LinkedList<int> list;
+    list.InsertTail(1);
+    list.InsertTail(2);
+    list.InsertTail(3);
+
+    int sum = 0;
+    list.ForEach([&sum](int value) {
+        sum += value;
+    });
+
+    EXPECT_EQ(sum, 6);
+}
+
+TEST(LinkedList, ForEach_ModifyValues)
+{
+    LinkedList<int> list;
+    list.InsertTail(5);
+    list.InsertTail(10);
+
+    list.ForEach([](int& value) {
+        value += 1; 
+    });
+
+    EXPECT_EQ(list.Get(0), 6);
+    EXPECT_EQ(list.Get(1), 11);
+}
+
+TEST(LinkedList, ForEach_EmptyList)
+{
+    LinkedList<int> list;
+    int count = 0;
+
+    list.ForEach([&count](int) {
+        count++;
+    });
+
+    EXPECT_EQ(count, 0); 
+}
+
+
+// Iterator
+
+TEST(LinkedList, Iterator_IterateValues)
+{
+    LinkedList<int> list;
+    list.InsertTail(1);
+    list.InsertTail(2);
+    list.InsertTail(3);
+
+    std::vector<int> values;
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+        values.push_back(*it);
+    }
+
+    EXPECT_EQ(values.size(), 3);
+    EXPECT_EQ(values[0], 1);
+    EXPECT_EQ(values[1], 2);
+    EXPECT_EQ(values[2], 3);
+}
+
+TEST(LinkedList, Iterator_ModifyValues)
+{
+    LinkedList<int> list;
+    list.InsertTail(10);
+    list.InsertTail(20);
+
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+        *it += 5;
+    }
+
+    EXPECT_EQ(list.Get(0), 15);
+    EXPECT_EQ(list.Get(1), 25);
+}
+
+TEST(LinkedList, Iterator_EmptyList)
+{
+    LinkedList<int> list;
+    int count = 0;
+
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+        count++;
+    }
+
+    EXPECT_EQ(count, 0);
+}
+
