@@ -121,11 +121,45 @@ class LinkedListBase
                   const char* what() const { return "Out of line"; }
             };
    };
-
+        
 template <typename T>
 class LinkedList : private LinkedListBase<T>
    {
       public:
+         template <typename Func>
+            void ForEach(Func func)
+            {
+               typename LinkedListBase<T>::Node* current = this->head;
+               while (current)
+                  {
+                     func(current->data); 
+                     current = current->next;
+                  }
+               }
+         class Iterator
+            {
+               typename LinkedListBase<T>::Node* current;
+               public:
+                  Iterator(typename LinkedListBase<T>::Node* node) : current(node) {};
+                  T& operator*() 
+                     { 
+                        return current->data; 
+                     }
+                  Iterator& operator++()
+                     {
+                           if (current) 
+                              {
+                                 current = current->next;
+                              }
+                           return *this;
+                     }
+                  bool operator!=(const Iterator& other) const
+                     {
+                           return current != other.current;
+                     }
+            };
+         Iterator begin() { return Iterator(this->head); }
+         Iterator end() { return Iterator(nullptr); }
          void InsertHead(T value)
             {
                typename LinkedListBase<T>::Node* NewNode = new typename LinkedListBase<T>::Node(value);
@@ -140,7 +174,6 @@ class LinkedList : private LinkedListBase<T>
                      InsertHead(value);
                      return;
                   }
-
                typename LinkedListBase<T>::Node*  current = this->head;
                   for(int i = 0 ; i < position - 1 ; i++)
                      {
