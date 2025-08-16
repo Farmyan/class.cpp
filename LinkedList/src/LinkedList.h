@@ -1,3 +1,4 @@
+#include <utility>
 template <typename T>
 class LinkedListBase
    {
@@ -44,38 +45,17 @@ class LinkedListBase
                }
          }
 
-      LinkedListBase& operator =(const LinkedListBase& other)
+      LinkedListBase& operator=(const LinkedListBase& other)
          {
-            if(this == &other)
+            if (this == &other)
                {
                   return *this;
                }
 
-            while(head)
-               {
-                  Node* temp = head;
-                  head = head->next;
-                  delete temp;
-               }
-
-            if(!other.head)
-               {
-                  head = nullptr;
-                  return *this;
-               }
-            head = new Node(other.head->data);
-            Node* current = head;
-            Node* src = other.head->next;
-
-            while(src)
-               {
-                  current->next = new Node(src->data);
-                  current = current->next;
-                  src = src->next;
-               }
+            LinkedListBase temp(other);   
+            std::swap(head, temp.head);   
             return *this;
          }
-
       //move semantics
       LinkedListBase(LinkedListBase&& other)
          {
@@ -83,24 +63,14 @@ class LinkedListBase
             other.head = nullptr;
          }
 
-      LinkedListBase& operator =(LinkedListBase&& other)
+      LinkedListBase& operator=(LinkedListBase&& other) noexcept
          {
-            if(this == &other)
+            if (this != &other)
                {
-                  return *this;
+                  std::swap(head, other.head);
                }
-
-            while(head)
-               {
-                  Node* temp = head;
-                  head = head->next;
-                  delete temp;
-               }
-            head = other.head;
-            other.head = nullptr;
             return *this;
          }
-
       //Exceptions
       public:
          class IndexOutOfBoundsException
@@ -120,10 +90,21 @@ class LinkedListBase
                public:
                   const char* what() const { return "Out of line"; }
             };
+         class IteratorInvalidDereferenceException 
+            {
+               public:
+                  const char* what() const { return "Iterator dereference on invalid position"; }
+            };
+
+         class IteratorIncrementException 
+            {
+               public:
+                  const char* what() const { return "Iterator increment past end"; }
+            };
    };
         
 template <typename T>
-class LinkedList : private LinkedListBase<T>
+class LinkedList : protected LinkedListBase<T>
    {
       public:
          template <typename Func>
@@ -136,27 +117,32 @@ class LinkedList : private LinkedListBase<T>
                      current = current->next;
                   }
                }
-         class Iterator
-            {
-               typename LinkedListBase<T>::Node* current;
-               public:
-                  Iterator(typename LinkedListBase<T>::Node* node) : current(node) {};
-                  T& operator*() 
-                     { 
-                        return current->data; 
-                     }
-                  Iterator& operator++()
-                     {
-                           if (current) 
-                              {
-                                 current = current->next;
-                              }
-                           return *this;
-                     }
-                  bool operator!=(const Iterator& other) const
-                     {
-                           return current != other.current;
-                     }
+         class Iterator {
+         typename LinkedListBase<T>::Node* current;
+            public:
+               Iterator(typename LinkedListBase<T>::Node* node) : current(node) {}
+               T& operator*() 
+                  {
+                     if (!current) 
+                        {
+                           throw typename LinkedListBase<T>::IteratorInvalidDereferenceException();
+                        }
+                     return current->data;
+                  }
+               Iterator& operator++() 
+                  {
+                     if (!current) 
+                        {
+                           throw typename LinkedListBase<T>::IteratorIncrementException();
+                        }
+                     current = current->next;
+                     return *this;
+                  }
+
+               bool operator!=(const Iterator& other) const 
+                  {
+                     return current != other.current;
+                  }
             };
          Iterator begin() { return Iterator(this->head); }
          Iterator end() { return Iterator(nullptr); }
