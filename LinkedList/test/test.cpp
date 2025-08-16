@@ -153,10 +153,7 @@ TEST(LinkedList, CopyAssignment_Remove)
     EXPECT_EQ(list2.Get(0), 15);
     EXPECT_EQ(list1.Get(0), 5);
 }
-
 //Step 6: Move semantic
-
-
 TEST(LinkedList, MoveConstructor)
 {
     LinkedList<int> list1;
@@ -339,4 +336,55 @@ TEST(LinkedList, Iterator_EmptyList)
 
     EXPECT_EQ(count, 0);
 }
+
+//Excations for Iterator
+
+TEST(LinkedList, Iterator_DereferenceOnEmptyList) 
+{
+    LinkedList<int> list;
+    LinkedList<int>::Iterator it = list.begin();
+    try 
+        {
+            *it;  
+            FAIL() << "Expected IteratorInvalidDereferenceException";
+        }
+    catch (const LinkedListBase<int>::IteratorInvalidDereferenceException& e) 
+        {
+            EXPECT_EQ(e.what(), "Iterator dereference on invalid position");
+        }
+}
+
+TEST(LinkedList, Iterator_IncrementPastEnd) {
+    LinkedList<int> list;
+    list.InsertHead(1);
+    LinkedList<int>::Iterator it = list.begin();
+    ++it; 
+    try 
+        {
+            ++it; 
+            FAIL() << "Expected IteratorIncrementException";
+        } 
+    catch (const LinkedListBase<int>::IteratorIncrementException& e) 
+        {
+            EXPECT_EQ(e.what(), "Iterator increment past end");
+        }
+}
+
+TEST(LinkedList, Iterator_DereferenceAfterIncrementPastEnd) {
+    LinkedList<int> list;
+    list.InsertHead(1);
+    LinkedList<int>::Iterator it = list.begin();
+    ++it; 
+
+    try 
+        {
+            *it; 
+            FAIL() << "Expected IteratorInvalidDereferenceException";
+        } 
+    catch (const LinkedListBase<int>::IteratorInvalidDereferenceException& e) 
+        {
+            EXPECT_EQ(e.what(), "Iterator dereference on invalid position");
+        }
+}
+
 
