@@ -1,3 +1,7 @@
+#include <algorithm> // for std::copy
+#include <functional> // for std::plus, std::minus
+#include <utility>   // for std::swap
+
 template <typename T>
 class MatrixClassBase
     {
@@ -21,27 +25,19 @@ class MatrixClassBase
                     delete[] data;
                 }   
 
-            MatrixClassBase(const MatrixClassBase& other) : rows(other.rows) , cols(other.cols) , data(nullptr)
+            MatrixClassBase(const MatrixClassBase& other) : rows(other.rows), cols(other.cols), data(nullptr)
                 {
-                    data = new T[cols * rows];
-                    for(int i = 0 ; i < rows * cols ; i++)
-                        {
-                            data[i] = other.data[i];
-                        }          
+                    data = new T[rows * cols];
+                    std::copy(other.data, other.data + rows * cols, data);
                 }
             MatrixClassBase& operator=(const MatrixClassBase& other)
                 {
-                    if(this != &other)
+                    if (this != &other)
                         {
-                            T* newData = new T[other.rows * other.cols];
-                            for(int i = 0 ; i < other.rows * other.cols ; i++)
-                                {
-                                    newData[i] = other.data[i];
-                                }
-                            delete[] data;
-                            data = newData;
-                            rows = other.rows;
-                            cols = other.cols;
+                            MatrixClassBase temp(other); 
+                            std::swap(rows, temp.rows);
+                            std::swap(cols, temp.cols);
+                            std::swap(data, temp.data);
                         }
                     return *this;
                 }
@@ -117,32 +113,28 @@ class MatrixClass : protected MatrixClassBase<T>
                         }
                     return  this->data[r * this->cols + c ];
                 }
+
             MatrixClass operator+(const MatrixClass& other) const
                 {
-                    if(this->rows != other.rows || this->cols != other.cols )
+                    if (this->rows != other.rows || this->cols != other.cols)
                         {
                             throw typename MatrixClassBase<T>::SizeMismatchException();
                         }
-                    MatrixClass res(this->rows , this->cols);
-                    for(int i = 0 ; i < this->cols * this->rows ; i++)
-                        {
-                            res.data[i] = this->data[i] + other.data[i];
-                        }
+                    MatrixClass res(this->rows, this->cols);
+                    std::transform(this->data, this->data + this->rows * this->cols, other.data, res.data, std::plus<T>());
                     return res;
                 }
             MatrixClass operator-(const MatrixClass& other) const
                 {
-                    if(this->rows != other.rows || this->cols != other.cols )
+                    if (this->rows != other.rows || this->cols != other.cols)
                         {
                             throw typename MatrixClassBase<T>::SizeMismatchException();
                         }
-                    MatrixClass res(this->rows , this->cols);
-                    for(int i = 0 ; i < this->cols * this->rows ; i++)
-                        {
-                            res.data[i] = this->data[i] - other.data[i];
-                        }
+                    MatrixClass res(this->rows, this->cols);
+                    std::transform(this->data, this->data + this->rows * this->cols, other.data, res.data, std::minus<T>());
                     return res;
                 }
+
             MatrixClass operator*(const MatrixClass& other)
                 {
                     if(this->cols != other.rows)
