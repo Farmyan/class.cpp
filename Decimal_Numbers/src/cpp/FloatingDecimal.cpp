@@ -1,7 +1,6 @@
 #include "FloatingDecimal.h"
 #include "FixedDecimal.h"
 
-// double dispatch
 DecimalBase* FloatingDecimal::Add(const DecimalBase& other) const 
     {
         return other.AddToFloating(*this);
