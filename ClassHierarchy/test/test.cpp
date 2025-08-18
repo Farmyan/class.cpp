@@ -278,3 +278,51 @@ TEST(StateAgencyTest, NebraskaBoard) {
     StateAgency org("Nebraska Power Review Board", "USA", "Energy", "Approving and regulating electric generation in Nebraska");
     EXPECT_EQ(org.getDescription(), "StateAgency: Nebraska Power Review Board from USA focused on Approving and regulating electric generation in Nebraska");
 }
+//Registrar
+TEST(RegistrarTest, RegisterAndSize) {
+    Registrar reg;
+    EXPECT_EQ(reg.size(), 0);
+
+    reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
+    EXPECT_EQ(reg.size(), 1);
+
+    reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
+    EXPECT_EQ(reg.size(), 2);
+}
+
+TEST(RegistrarTest, PreventDuplicate) {
+    Registrar reg;
+    EXPECT_TRUE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Funding creative projects")));
+    EXPECT_FALSE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Duplicate"))); // duplicate
+    EXPECT_EQ(reg.size(), 1);
+}
+
+TEST(RegistrarTest, GetByIndex) {
+    Registrar reg;
+    reg.registerOrg(new BCorp("Bombas", "USA", "Apparel", "Buy one, donate one"));
+    reg.registerOrg(new Association("NBA", "USA", "Sports", "Basketball league"));
+
+    EXPECT_EQ(reg.get(0)->getName(), "Bombas");
+    EXPECT_EQ(reg.get(1)->getName(), "NBA");
+    EXPECT_EQ(reg.get(-1), nullptr);
+    EXPECT_EQ(reg.get(5), nullptr);
+}
+
+// Report Tests 
+TEST(ReportTest, CSVReport) {
+    Registrar reg;
+    reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
+    reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
+    CSVDetailReport csv;
+    csv.generate(reg); 
+    EXPECT_EQ(reg.size(), 2); 
+}
+
+TEST(ReportTest, MarkdownReport) {
+    Registrar reg;
+    reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Funding creative projects"));
+    reg.registerOrg(new Association("NEA", "USA", "Education", "National Education Association"));
+    MarkdownDetailReport md;
+    md.generate(reg); 
+    EXPECT_EQ(reg.size(), 2); 
+}
