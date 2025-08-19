@@ -1,0 +1,5 @@
+megs: 16
+romimage: file=./BIOS-bochs-latest
+vgaromimage: file=./VGABIOS-lgpl-latest
+boot: a
+floppya: 1_44=build/disk.img, status=inserted
