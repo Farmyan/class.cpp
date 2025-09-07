@@ -278,51 +278,89 @@ TEST(StateAgencyTest, NebraskaBoard) {
     StateAgency org("Nebraska Power Review Board", "USA", "Energy", "Approving and regulating electric generation in Nebraska");
     EXPECT_EQ(org.getDescription(), "StateAgency: Nebraska Power Review Board from USA focused on Approving and regulating electric generation in Nebraska");
 }
-//Registrar
-TEST(RegistrarTest, RegisterAndSize) {
-    Registrar reg;
-    EXPECT_EQ(reg.size(), 0);
+// Registrar 
+TEST(RegistrarTest, RegisterAndSize) 
+    {
+        Registrar reg;
+        EXPECT_EQ(reg.size(), 0);
 
-    reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
-    EXPECT_EQ(reg.size(), 1);
+        reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
+        EXPECT_EQ(reg.size(), 1);
 
-    reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
-    EXPECT_EQ(reg.size(), 2);
-}
+        reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
+        EXPECT_EQ(reg.size(), 2);
 
-TEST(RegistrarTest, PreventDuplicate) {
-    Registrar reg;
-    EXPECT_TRUE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Funding creative projects")));
-    EXPECT_FALSE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Duplicate"))); // duplicate
-    EXPECT_EQ(reg.size(), 1);
-}
+        reg.registerOrg(new CJSC("Ameriabank", "Armenia", "Banking", "Retail and corporate banking services"));
+        EXPECT_EQ(reg.size(), 3);
+    }
 
-TEST(RegistrarTest, GetByIndex) {
-    Registrar reg;
-    reg.registerOrg(new BCorp("Bombas", "USA", "Apparel", "Buy one, donate one"));
-    reg.registerOrg(new Association("NBA", "USA", "Sports", "Basketball league"));
+TEST(RegistrarTest, PreventDuplicate) 
+    {
+        Registrar reg;
+        EXPECT_TRUE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Funding creative projects")));
+        EXPECT_FALSE(reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Duplicate"))); 
+        EXPECT_EQ(reg.size(), 1);
+    }
 
-    EXPECT_EQ(reg.get(0)->getName(), "Bombas");
-    EXPECT_EQ(reg.get(1)->getName(), "NBA");
-    EXPECT_EQ(reg.get(-1), nullptr);
-    EXPECT_EQ(reg.get(5), nullptr);
-}
+TEST(RegistrarTest, GetByIndex) 
+    {
+        Registrar reg;
+        reg.registerOrg(new BCorp("Bombas", "USA", "Apparel", "Buy one, donate one"));
+        reg.registerOrg(new Association("NBA", "USA", "Sports", "Basketball league"));
 
-// Report Tests 
-TEST(ReportTest, CSVReport) {
-    Registrar reg;
-    reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
-    reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
-    CSVDetailReport csv;
-    csv.generate(reg); 
-    EXPECT_EQ(reg.size(), 2); 
-}
+        EXPECT_EQ(reg.get(0)->getName(), "Bombas");
+        EXPECT_EQ(reg.get(1)->getName(), "NBA");
+        EXPECT_EQ(reg.get(-1), nullptr);
+        EXPECT_EQ(reg.get(5), nullptr);
+    }
 
-TEST(ReportTest, MarkdownReport) {
-    Registrar reg;
-    reg.registerOrg(new BCorp("Kickstarter", "USA", "Platform", "Funding creative projects"));
-    reg.registerOrg(new Association("NEA", "USA", "Education", "National Education Association"));
-    MarkdownDetailReport md;
-    md.generate(reg); 
-    EXPECT_EQ(reg.size(), 2); 
-}
+TEST(RegistrarTest, MultipleTypes) 
+    {
+        Registrar reg;
+        reg.registerOrg(new CJSC("VTB Bank Armenia", "Armenia", "Banking", "Part of VTB Group offering banking services"));
+        reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
+        reg.registerOrg(new Association("NEA", "USA", "Education", "National Education Association"));
+
+        EXPECT_EQ(reg.size(), 3);
+        EXPECT_EQ(reg.get(0)->getDescription(), "CJSC: VTB Bank Armenia from Armenia focused on Part of VTB Group offering banking services");
+        EXPECT_EQ(reg.get(1)->getDescription(), "BCorp: Patagonia from USA focused on Sustainable outdoor gear");
+        EXPECT_EQ(reg.get(2)->getDescription(), "Association: NEA from USA focused on National Education Association");
+    }
+
+//Report 
+TEST(ReportTest, ReportOutput) 
+    {
+        Registrar reg;
+        reg.registerOrg(new BCorp("Patagonia", "USA", "Apparel", "Sustainable outdoor gear"));
+        reg.registerOrg(new Association("ABA", "USA", "Legal", "American Bar Association"));
+
+        Report rep;
+        rep.generate(reg); 
+
+        EXPECT_EQ(reg.size(), 2);
+    }
+
+TEST(ReportTest, EmptyRegistrarReport) 
+    {
+        Registrar reg;
+        Report rep;
+        rep.generate(reg); 
+        EXPECT_EQ(reg.size(), 0);
+    }
+
+TEST(ReportTest, MixedTypesReport) 
+    {
+        Registrar reg;
+        reg.registerOrg(new CJSC("INCORE", "Armenia", "IT Services", "Custom software development"));
+        reg.registerOrg(new BCorp("Leesa", "USA", "Furniture", "Mattresses; one sold, one donated"));
+        reg.registerOrg(new Association("AMA", "USA", "Medical", "Supports physicians"));
+
+        Report rep;
+        rep.generate(reg);
+
+        EXPECT_EQ(reg.size(), 3);
+        EXPECT_EQ(reg.get(0)->getName(), "INCORE");
+        EXPECT_EQ(reg.get(1)->getName(), "Leesa");
+        EXPECT_EQ(reg.get(2)->getName(), "AMA");
+    }
+
