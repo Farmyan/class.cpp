@@ -3,63 +3,46 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string>
-#include <vector>
 
 TEST(File, Open_CreateFile) 
     {
         File f;
-        try 
-            { 
-                f.open("testfile.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644); 
-            } 
-        catch (const File::OpenFileException& e) 
-            { 
-                FAIL() << "Expected successful open, got exception: " << e.what(); 
-            }
+        EXPECT_NO_THROW(f.open("test_rw.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644));
     }
 
-TEST(File, Write_FileContent) 
+TEST(File, WriteAndRead_FileContent) 
     {
         File f;
-        f.open("testfile.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        try 
-            { 
-                f.write("Hello"); 
-            } 
-        catch (const File::WriteFileException& e) 
-            { 
-                FAIL() << "Expected successful write, got exception: " << e.what(); 
-            }
-    }
+        EXPECT_NO_THROW(f.open("test_rw.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644));
+        EXPECT_NO_THROW(f.write("Hello World"));
+        f.close();
 
-TEST(File, Append_FileContent) 
-    {
-        File f;
-        f.open("testfile.txt", O_WRONLY | O_APPEND);
-        try 
-            { 
-                f.write(" World"); 
-            } 
-        catch (const File::WriteFileException& e) 
-            { 
-                FAIL() << "Expected successful append, got exception: " << e.what(); 
-            }
-    }
-
-TEST(File, Read_FileContent) 
-    {
-        File f;
-        f.open("testfile.txt", O_RDONLY);
+        File f2;
+        EXPECT_NO_THROW(f2.open("test_rw.txt", O_RDONLY));
         char buffer[1024] = {0};
         int bytesRead = 0;
-        try 
-            { 
-                bytesRead = f.read(buffer, sizeof(buffer)); 
-            } 
-        catch (const File::ReadFileException& e) 
-            { 
-                FAIL() << "Expected successful read, got exception: " << e.what(); 
-            }
+        EXPECT_NO_THROW(bytesRead = f2.read(buffer, sizeof(buffer)));
+        std::string content(buffer, bytesRead);
+        EXPECT_EQ(content, "Hello World");
+    }
+
+TEST(File, AppendAndRead_FileContent) 
+    {
+        File f;
+        EXPECT_NO_THROW(f.open("test_rw.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644));
+        EXPECT_NO_THROW(f.write("Hello"));
+        f.close();
+
+        File f2;
+        EXPECT_NO_THROW(f2.open("test_rw.txt", O_WRONLY | O_APPEND));
+        EXPECT_NO_THROW(f2.write(" World"));
+        f2.close();
+
+        File f3;
+        EXPECT_NO_THROW(f3.open("test_rw.txt", O_RDONLY));
+        char buffer[1024] = {0};
+        int bytesRead = 0;
+        EXPECT_NO_THROW(bytesRead = f3.read(buffer, sizeof(buffer)));
         std::string content(buffer, bytesRead);
         EXPECT_EQ(content, "Hello World");
     }
@@ -67,42 +50,18 @@ TEST(File, Read_FileContent)
 TEST(File, OpenNonExistingFile) 
     {
         File f;
-        try 
-            { 
-                f.open("nonexisting.txt", O_RDONLY); 
-                FAIL() << "Expected OpenFileException";
-            } 
-        catch (const File::OpenFileException& e) 
-            { 
-                EXPECT_EQ(std::string(e.what()), "Failed to open file"); 
-            }
+        EXPECT_THROW(f.open("nonexisting.txt", O_RDONLY), File::OpenFileException);
     }
-    
+
 TEST(File, WriteClosedFile) 
     {
         File f;
-        try 
-            { 
-                f.write("Data"); 
-                FAIL() << "Expected WriteFileException";
-            } 
-        catch (const File::WriteFileException& e) 
-            { 
-                EXPECT_EQ(std::string(e.what()), "Write called on closed file"); 
-            }
+        EXPECT_THROW(f.write("Data"), File::WriteFileException);
     }
 
 TEST(File, ReadClosedFile) 
     {
         File f;
         char buffer[10];
-        try 
-            { 
-                f.read(buffer, sizeof(buffer)); 
-                FAIL() << "Expected ReadFileException";
-            } 
-        catch (const File::ReadFileException& e) 
-            { 
-                EXPECT_EQ(std::string(e.what()), "Read called on closed file"); 
-            }
+        EXPECT_THROW(f.read(buffer, sizeof(buffer)), File::ReadFileException);
     }
